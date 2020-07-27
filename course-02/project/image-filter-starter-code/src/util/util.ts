@@ -1,4 +1,3 @@
-import { Jimp } from 'jimp/es';
 import fs from 'fs';
 const Jimp = require('jimp');
 import path from 'path';
@@ -16,12 +15,12 @@ export async function filterImageFromURL(inputURL: string): Promise<string>{
         const image_path:string = path.join(__dirname, 'tmp', image_name);
 
         try {
-            const photo:Jimp = await Jimp.read(inputURL);
+            const photo = await Jimp.read(inputURL);
             photo
             .resize(256, 256) // resize
             .quality(60) // set JPEG quality
             .greyscale() // set greyscale
-            .write(image_path, (img) => {
+            .write(image_path, (img:any) => {
                 resolve(image_path);
             })
         } catch(e) {
