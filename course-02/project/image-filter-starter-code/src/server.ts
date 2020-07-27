@@ -29,34 +29,35 @@ import validator from 'validator';
 
   /**************************************************************************** */
   app.get('/filteredimage', async (req: Request, res: Response, next) => {
-    const imageUrl:string = req.query.image_url
-    if (!imageUrl) {
-      return res.status(400).send({ "message": "No URL was specified in the query string" })
+    const image_url: string = req.query.image_url
+    if (!image_url) {
+      return res.status(400).send({ "message": "No URL was provided" })
     }
     // validate image query
-    if (!validator.isURL(imageUrl, { allow_underscores: true })) {
-      return res.status(400).send({ "message": "Invalid URL" })
+    if (!validator.isURL(image_url, { allow_underscores: true })) {
+      return res.status(400).send({ "message": "URL is not valid" })
     }
     const authorizedExtensions = ['jpg', 'jpeg', 'svg', 'png', 'bmp', 'gif'];
 
-    if (!authorizedExtensions.includes(imageUrl.split('.')[imageUrl.split('.').length - 1])) {
-      return res.status(400).send({ "message": "Not an image or extension missing" })
+    if (!authorizedExtensions.includes(image_url.split('.')[image_url.split('.').length - 1])) {
+      return res.status(400).send({ "message": "Wrong image extension" })
     };
 
-    // Get image from given URL, filter and save it locally
-    let image_path:string;
+    // Extract image from the URL, filter the image and save it locally
+    let image_info: string;
 
     try {
-      image_path = await filterImageFromURL(imageUrl);
-    } catch(e) {
-      return res.status(500).send({ message: `Failed to process image: ${e.message}` });
+      image_info = await filterImageFromURL(image_url);
+    } catch (error) {
+      return res.status(500).send({ message: `Failed to process image: ${error.message}` });
     }
 
-    // return filtered image to user
-    return res.sendFile(image_path, (err) => {
-      deleteLocalFiles([image_path]);
+    // return the filtered image to user
+    return res.sendFile(image_info, (err) => {
+      deleteLocalFiles([image_info]);
     });
-  })
+  });
+  
   //! END @TODO1
   
   // Root Endpoint
